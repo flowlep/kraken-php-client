@@ -1,5 +1,5 @@
 {
-  "name": "andreas-glaser/kraken-php-client",
+  "name": "flowlep/kraken-php-client",
   "description": "An efficient kraken rest api client, built on top of guzzle",
   "keywords": [
     "php",
@@ -7,7 +7,7 @@
     "rest-client",
     "poloniex"
   ],
-  "homepage": "https://github.com/andreas-glaser/kraken-php-client",
+  "homepage": "https://github.com/flowlep/kraken-php-client",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -15,6 +15,11 @@
       "name": "Andreas Glaser",
       "email": "andreas.glaser@protonmail.com",
       "homepage": "https://andreas.glaser.me"
+    },
+    {
+      "name": "Florian Lepot",
+      "email": "florian.lepot@gmail.com",
+      "homepage": "https://florianlepot.fr"
     }
   ],
   "require": {

@@ -13,6 +13,7 @@ use GuzzleHttp\Client;
 class KPC
 {
     const RESOURCE_BASE = 'https://api.kraken.com/0';
+    const RESOURCE_VERSION = '0';
     const RESOURCE_PUBLIC = '/public';
     const RESOURCE_PRIVATE = '/private';
 
@@ -67,33 +68,33 @@ class KPC
     }
 
     /**
-     * @param string $resource
+     * @param string $method
      * @param array  $params
      *
      * @return \AndreasGlaser\KPC\Result
      * @author Andreas Glaser
      */
-    public function sendPrivateRequest(string $resource, array $params = []): Result
+    public function sendPrivateRequest(string $method, array $params = [])
     {
-        if (!$this->enablePrivate) {
-            throw new \LogicException('Private request are not possible if api key and secret have not been set');
-        }
+        $nonce = explode(' ', microtime());
+        $params['nonce'] = $nonce[1] . str_pad(substr($nonce[0], 2, 6), 6, '0');
 
-        $mt = explode(' ', microtime());
-        $params['nonce'] = $mt[1] . substr($mt[0], 2, 6);
+        // build the POST data string
+        $postdata = http_build_query($params, '', '&');
 
-        $post_data = http_build_query($params, '', '&');
-        $sign = hash_hmac('sha512', $post_data, $this->apiSecret);
+        // set API key and sign the message
+        $path = '/' . self::RESOURCE_VERSION . '/private/' . $method;
+        $sign = hash_hmac('sha512', $path . hash('sha256', $params['nonce'] . $postdata, true), base64_decode($this->apiSecret), true);
 
         $options = [
             'headers'     => [
                 'API-Key'  => $this->apiKey,
-                'API-Sign' => $sign,
+                'API-Sign' => base64_encode($sign),
             ],
             'form_params' => $params,
         ];
 
-        $url = self::RESOURCE_BASE . self::RESOURCE_PRIVATE . '/' . $resource;
+        $url = self::RESOURCE_BASE . self::RESOURCE_PRIVATE . '/' . $method;
         $response = $this->httpClient->post($url, $options);
 
         return new Result($response);
